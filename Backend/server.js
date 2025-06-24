@@ -8,9 +8,9 @@ const db = require('./models');
 require('./config/passport')(passport);
 
 const app = express();
-
+const FRONTEND_URL = process.env.FRONTEND_URL;
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: `${FRONTEND_URL}`,
   credentials: true
 }));
 app.use(express.json());

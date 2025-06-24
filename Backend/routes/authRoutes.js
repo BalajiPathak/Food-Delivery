@@ -4,6 +4,9 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const jwt = require('jsonwebtoken');
 
+require('dotenv').config(); // 🔑 Load .env
+const FRONTEND_URL = process.env.FRONTEND_URL; // ✅ Use after dotenv
+
 // Middleware to check auth token from cookies
 const requireAuth = (req, res, next) => {
   const token = req.cookies.token;
@@ -20,19 +23,35 @@ const requireAuth = (req, res, next) => {
 
 // Route: GET /auth/me
 router.get('/me', requireAuth, (req, res) => {
-  res.json({ user: req.user }); // You can send more info if needed
+  res.json({ user: req.user });
 });
 
-// Register + Login
+// Auth Routes
 router.post('/register', authController.register);
 router.post('/login', authController.login);
 router.post('/logout', authController.logout);
 
 // Google OAuth
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-  const token = jwt.sign({ id: req.user.id, email: req.user.email }, process.env.JWT_SECRET);
-  res.redirect(`http://localhost:5173/dashboard?token=${token}`); // For now
-});
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  (req, res) => {
+    const token = jwt.sign(
+      { id: req.user.id, email: req.user.email, name: req.user.name },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.redirect(`${FRONTEND_URL}/dashboard`);
+  }
+);
 
 module.exports = router;
