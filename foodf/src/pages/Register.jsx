@@ -98,6 +98,13 @@ const Register = () => {
           >
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
+
+          <a
+            href="http://localhost:5000/auth/google"
+            className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors block text-center mt-4"
+          >
+            Register with Google
+          </a>
         </div>
 
         <div className="mt-6 text-center">
