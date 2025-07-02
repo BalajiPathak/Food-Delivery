@@ -1,28 +1,38 @@
 // src/PrivateRoute.jsx
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from './axios';
 
 const PrivateRoute = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [authenticated, setAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('/auth/me')
-      .then(() => {
-        setAuthenticated(true);
-      })
-      .catch(() => {
-        setAuthenticated(false);
-      })
-      .finally(() => {
+    const checkAuth = async () => {
+      try {
+        await axios.get('/auth/me');
+        setIsAuthenticated(true);
+      } catch (error) {
+        // Redirect to login if not authenticated
+        navigate('/login');
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  if (loading) return null; // Optional: show loading spinner here
-  return authenticated ? children : <Navigate to="/login" />;
+    checkAuth();
+  }, [navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? children : null;
 };
 
 export default PrivateRoute;
-  

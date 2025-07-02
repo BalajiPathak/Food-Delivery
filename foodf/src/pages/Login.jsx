@@ -30,11 +30,12 @@ const Login = () => {
 
     setLoading(true);
     try {
-      await axios.post('/auth/login', { email, password }); // ✅ cookie-based auth
+      const response = await axios.post('/auth/login', { email, password });
+
       toast.success('Login successful!');
       navigate('/dashboard');
     } catch (err) {
-      const msg = err.response?.data?.message || 'Invalid email or password';
+      const msg = err.response?.data?.error || 'Invalid email or password';
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -43,46 +44,55 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-xl font-bold mb-4">Login</h2>
+      <div className="bg-white p-8 rounded-lg shadow-md w-96">
+        <div className="text-center mb-6">
+          <span className="text-3xl mr-2">🍔</span>
+          <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
+          <p className="text-gray-600 mt-2">Sign in to your account</p>
+        </div>
 
-        <input
-          type="email"
-          className="border w-full mb-2 p-2 rounded"
-          placeholder="Email"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
-        {formErrors.email && <p className="text-red-500 text-sm">{formErrors.email}</p>}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+            {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
+          </div>
 
-        <input
-          type="password"
-          className="border w-full mb-2 p-2 rounded"
-          placeholder="Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
-        {formErrors.password && <p className="text-red-500 text-sm">{formErrors.password}</p>}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              placeholder="Enter your password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            {formErrors.password && <p className="text-red-500 text-sm mt-1">{formErrors.password}</p>}
+          </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600 mt-2 disabled:opacity-50"
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </div>
 
-        <a
-          href={`${import.meta.env.VITE_BACKEND_URL}/auth/google`}
-          className="text-blue-600 block text-center mt-3 hover:underline"
-        >
-          Login with Google
-        </a>
-
-        <p className="mt-4 text-center text-sm">
-          New here?{' '}
-          <Link to="/register" className="text-blue-500 hover:underline">Register here</Link>
-        </p>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-green-600 hover:text-green-700 font-medium">
+              Sign up here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
